@@ -1,9 +1,9 @@
 body{ 
-  color: rgb(0, 0, 0);
+  color: rgb(16, 16, 16);
 }
 nav {
-    background-color: #222;
-    color: rgb(216, 211, 211);
+    background-color: #eac8c8;
+    color: rgb(108, 69, 69);
 
     padding: 15px 30px;
 
@@ -55,7 +55,7 @@ main{
 }
 .task-card{
 
-   background-color: white;
+   background-color: rgb(239, 233, 233);
 
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -71,5 +71,6 @@ main{
     font-size: 18px;
 }
 .task-card p{
+
     margin: 0;
 }
