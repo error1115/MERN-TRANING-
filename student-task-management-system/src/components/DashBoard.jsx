@@ -1,51 +1,72 @@
 import TaskCard from "./TaskCaed";
 import StatCard from "./StatCard";
-import AddTask from "./AddTask";    
+import AddTask from "./AddTask";
 import { useState } from "react";
-function DashBoard() {
-    
-    const [tasks, setTasks]=useState([{id:1, title:"learn react", 
-        description:"understanding components" ,
-        status:"pending"},
-        {id:2, title:"learn SQL",
-             description:"understanding queries",
-              status:"completed"},
-        {id:3, title:"learn DSA",
-             description:"understanding ",
-             status:"completed"}]);
-             function toggleTask(id){
-                setTasks((currentTasks) => currentTasks.map((task) =>
-                    task.id === id
-                        ? {...task, status: task.status === "pending" ? 
-                            
-                            "completed" : "pending"}
-                        : task
-                ));
-               }
-               function addTask(newTask){
-                console.log("newtask:",newtask)
-               }
+
+function DashBoard(props) {
+    const [tasks, setTasks] = useState([
+        { id: 1, title: "Learn React", description: "Understand components and state flow.", status: "pending" },
+        { id: 2, title: "Learn SQL", description: "Practice queries and joins.", status: "completed" },
+        { id: 3, title: "Learn DSA", description: "Review arrays and recursion patterns.", status: "completed" },
+    ]);
+
+    function toggleTask(id) {
+        props.setTasks((currentTasks) =>
+            currentTasks.map((task) =>
+                task.id === id
+                    ? { ...task, status: task.status === "pending" ? "completed" : "pending" }
+                    : task
+            )
+        );
+    }
+
+    function addTask(newTask) {
+        props.setTasks((currentTasks) => [newTask, ...currentTasks]);
+    }
+
+    function deleteTask(taskId) {
+        props.setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
+    }
+
+    const totalTasks = tasks.length;
+    const remainingTasks = tasks.filter((task) => task.status === "pending").length;
+    const completedTasks = tasks.filter((task) => task.status === "completed").length;
+
     return (
-         <main>
-                  
-        <div className="sat-container">
-            <StatCard title={"Total Tasks"} value={10}/>
-            <StatCard title={"Remaining Tasks "} value={3}/>
-            <StatCard title={"Completed Tasks"} value={7}/>
-        </div>
-        <AddTask onAddTask ={addTask}/>
-        <h2> Recent Task </h2>
-        <div className="tasks-container"> 
-         {tasks.map((task)=>(
-            <TaskCard title ={task.title} description={task.description}
-            status={task.status} 
-            onToggle={()=>toggleTask(task.id)}/>
-        
-            ))};
-         
-        </div>
+        <main className="dashboard-page">
+            <div className="stats-container">
+                <StatCard title={"Total Tasks"} value={totalTasks} />
+                <StatCard title={"Remaining Tasks"} value={remainingTasks} />
+                <StatCard title={"Completed Tasks"} value={completedTasks} />
+            </div>
+
+            <AddTask onAddTask={addTask} />
+
+            <section className="task-section">
+                <div className="section-title-row">
+                    <h2>Recent Tasks</h2>
+                </div>
+
+                <div className="tasks-container">
+                    {tasks.length === 0 ? (
+                        <div className="empty-state">No tasks yet. Add one to get started.</div>
+                    ) : 
+                       (props. tasks.map((task) => (
+                            <TaskCard
+                                key={task.id}
+                                id={task.id}
+                                title={task.title}
+                                description={task.description}
+                                status={task.status}
+                                onToggle={() => toggleTask(task.id)}
+                                onDelete={() => deleteTask(task.id)}
+                            />
+                        ))
+                    )}
+                </div>
+            </section>
         </main>
-);
+    );
 }
 
 export default DashBoard;
