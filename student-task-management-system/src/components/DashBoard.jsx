@@ -1,17 +1,11 @@
 import TaskCard from "./TaskCaed";
 import StatCard from "./StatCard";
 import AddTask from "./AddTask";
-import { useState } from "react";
 
-function DashBoard(props) {
-    const [tasks, setTasks] = useState([
-        { id: 1, title: "Learn React", description: "Understand components and state flow.", status: "pending" },
-        { id: 2, title: "Learn SQL", description: "Practice queries and joins.", status: "completed" },
-        { id: 3, title: "Learn DSA", description: "Review arrays and recursion patterns.", status: "completed" },
-    ]);
+function DashBoard({ tasks, setTasks }) {
 
     function toggleTask(id) {
-        props.setTasks((currentTasks) =>
+        setTasks((currentTasks) =>
             currentTasks.map((task) =>
                 task.id === id
                     ? { ...task, status: task.status === "pending" ? "completed" : "pending" }
@@ -21,11 +15,11 @@ function DashBoard(props) {
     }
 
     function addTask(newTask) {
-        props.setTasks((currentTasks) => [newTask, ...currentTasks]);
+        setTasks((currentTasks) => [newTask, ...currentTasks]);
     }
 
     function deleteTask(taskId) {
-        props.setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
+        setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
     }
 
     const totalTasks = tasks.length;
@@ -50,8 +44,8 @@ function DashBoard(props) {
                 <div className="tasks-container">
                     {tasks.length === 0 ? (
                         <div className="empty-state">No tasks yet. Add one to get started.</div>
-                    ) : 
-                       (props. tasks.map((task) => (
+                    ) : (
+                        tasks.map((task) => (
                             <TaskCard
                                 key={task.id}
                                 id={task.id}

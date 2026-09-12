@@ -1,9 +1,25 @@
-function Tasks() {
+import TaskCard from "./TaskCaed";
+
+function Tasks({ tasks }) {
   return (
-    <div>
+    <main className="dashboard-page">
       <h1>Tasks</h1>
-      <p>All the Students Tasks will appear here </p>
-    </div>
+      <div className="tasks-container">
+        {tasks.length === 0 ? (
+          <p className="empty-state">No tasks yet.</p>
+        ) : (
+          tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              id={task.id}
+              title={task.title}
+              description={task.description}
+              status={task.status}
+            />
+          ))
+        )}
+      </div>
+    </main>
   );
 }
 export default Tasks;
