@@ -1,6 +1,20 @@
 import TaskCard from "./TaskCaed";
 
-function Tasks({ tasks }) {
+function Tasks({ tasks, setTasks }) {
+  function toggleTask(id) {
+    setTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        task.id === id
+          ? { ...task, status: task.status === "pending" ? "completed" : "pending" }
+          : task
+      )
+    );
+  }
+
+  function deleteTask(taskId) {
+    setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
+  }
+
   return (
     <main className="dashboard-page">
       <h1>Tasks</h1>
@@ -15,6 +29,8 @@ function Tasks({ tasks }) {
               title={task.title}
               description={task.description}
               status={task.status}
+              onToggle={() => toggleTask(task.id)}
+              onDelete={() => deleteTask(task.id)}
             />
           ))
         )}
