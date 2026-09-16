@@ -6,7 +6,7 @@ const cors=require('cors');
 const app=express();
 // install cors middleware to allow cross-origin requests
 app.use(cors());
-
+app.use(express.json());
 const initialTasks = [
   {
     id: 1,
@@ -29,6 +29,19 @@ const initialTasks = [
 ];
 app.get("/api/tasks", (req, res) => {
   res.json(initialTasks);
+});
+app.get("/api/tasks/:id",(req,res)=>{
+  const id=Number(req.params.id);
+  const task = initialTasks.find((initialTasks)=>initialTasks.id===id);
+  if(!task){
+    return res.status(404).json({error:"task noot found"})
+  }
+  res.json(task);
+});
+app.post("/api/tasks",(req,res)=>{
+  const newTask=req.body;
+  initialTasks.push(newTask);
+  res.status(201).json(newTask);
 });
 
 //API Route(testing backend connection)
