@@ -1,10 +1,10 @@
 import { useState } from "react";
 
-function AddTask({ onAddTask }) {
+ function AddTask({ onAddTask }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
 
         const trimmedTitle = title.trim();
@@ -21,9 +21,24 @@ function AddTask({ onAddTask }) {
             status: "pending",
         };
 
-        onAddTask(task);
-        setTitle("");
-        setDescription("");
+        try {
+            const response = await fetch("/api/tasks", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(task),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to add task: ${response.status}`);
+            }
+
+            const savedTask = await response.json();
+            onAddTask(savedTask);
+            setTitle("");
+            setDescription("");
+        } catch (error) {
+            console.error("Error adding task:", error);
+        }
     }
 
     return (
@@ -54,6 +69,6 @@ function AddTask({ onAddTask }) {
             </form>
         </section>
     );
-}
 
+ }
 export default AddTask;

@@ -8,7 +8,7 @@ import { Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 function App() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
     fetch("/api/tasks")
