@@ -30,15 +30,35 @@ const initialTasks = [
 app.get("/api/tasks", (req, res) => {
   res.json(initialTasks);
 });
-app.get("/api/tasks/:id",(req,res)=>{
+app.get("/api/tasks/:id",(req,res)=>{   //read
   const id=Number(req.params.id);
   const task = initialTasks.find((initialTasks)=>initialTasks.id===id);
   if(!task){
-    return res.status(404).json({error:"task noot found"})
+    return res.status(404).json({error:"task deleted"})
   }
   res.json(task);
 });
-app.post("/api/tasks",(req,res)=>{
+
+app.put("/api/tasks/:id",(req,res)=>{ //update
+    const id=Number(req.params.id);
+    const task= initialTasks.find((task)=>task.id===id);
+    if(!task){
+      return res.status(404).json({message:"task not found"})
+    }
+    task.status = req.body.status;
+    res.json(task);
+})
+
+app.delete("/api/tasks/:id",(req,res) =>{
+  const id=Number(req.params.id);
+  const taskIndex=initialTasks.findIndex((task)=>task.id===id)
+  if(taskIndex=== -1){
+    return res.status(404).json({message:" task not found" })
+  }
+  const deletedtask=initialTasks.splice(taskIndex,1);
+  res.json(deletedtask[0]);
+})
+app.post("/api/tasks",(req,res)=>{    //add
   const newTask=req.body;
   initialTasks.push(newTask);
   res.status(201).json(newTask);

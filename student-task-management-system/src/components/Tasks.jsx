@@ -2,17 +2,48 @@ import TaskCard from "./TaskCaed";
 
 function Tasks({ tasks, setTasks }) {
   function toggleTask(id) {
-    setTasks((currentTasks) =>
-      currentTasks.map((task) =>
-        task.id === id
-          ? { ...task, status: task.status === "pending" ? "completed" : "pending" }
-          : task
-      )
-    );
+    const taskToToggle = tasks.find((task) => task.id === id);
+    if (!taskToToggle) return;
+
+    const nextStatus = taskToToggle.status === "pending" ? "completed" : "pending";
+
+    fetch(`/api/tasks/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: nextStatus }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Task update failed: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((updatedTask) => {
+        setTasks((currentTasks) =>
+          currentTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+        );
+      })
+      .catch((error) => {
+        console.error("Error toggling task:", error);
+      });
   }
 
   function deleteTask(taskId) {
-    setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
+    fetch(`/api/tasks/${taskId}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Delete failed: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(() => {
+        setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
+      })
+      .catch((error) => {
+        console.error("Error deleting task:", error);
+      });
   }
 
   return (
