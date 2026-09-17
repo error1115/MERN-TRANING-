@@ -1,74 +1,68 @@
 import { useState } from "react";
 
- function AddTask({ onAddTask }) {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+export default function AddTask(props) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
-    async function handleSubmit(event) {
-        event.preventDefault();
+  async function handleSubmit(e) {
+    e.preventDefault();
 
-        const trimmedTitle = title.trim();
-        const trimmedDescription = description.trim();
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
 
-        if (!trimmedTitle || !trimmedDescription) {
-            return;
-        }
-
-        const task = {
-            id: Date.now(),
-            title: trimmedTitle,
-            description: trimmedDescription,
-            status: "pending",
-        };
-
-        try {
-            const response = await fetch("/api/tasks", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(task),
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to add task: ${response.status}`);
-            }
-
-            const savedTask = await response.json();
-            onAddTask(savedTask);
-            setTitle("");
-            setDescription("");
-        } catch (error) {
-            console.error("Error adding task:", error);
-        }
+    if (!trimmedTitle || !trimmedDescription) {
+      alert("Please fill in both title and description.");
+      return;
     }
+    const newTask = {
+      title: trimmedTitle,
+      description: trimmedDescription,
+      status: "Pending",
+    };
 
-    return (
-        <section className="add-task-box">
-            <h2>Add Task</h2>
-            <form onSubmit={handleSubmit} className="task-form">
-                <label>
-                    <span>Title</span>
-                    <input
-                        type="text"
-                        placeholder="Enter task title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
-                </label>
+    try {
+      const response = await fetch("/api/tasks",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newTask),
+        }
+      );
 
-                <label>
-                    <span>Description</span>
-                    <input
-                        type="text"
-                        placeholder="Enter task description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                    />
-                </label>
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
 
-                <button type="submit" className="primary-btn">Add Task</button>
-            </form>
-        </section>
-    );
+      const savedTask = await response.json();
+      props.onAddTask(savedTask);
+      setTitle("");
+      setDescription("");
+    } catch (error) {
+      console.error("Error adding task:", error);
+    }
+  }
 
- }
-export default AddTask;
+  return (
+    <div className="add-task">
+      <form onSubmit={handleSubmit}>
+        <label> Add Title </label>
+        <input
+          type="text"
+          value={title}
+          placeholder="Task title"
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <br />
+        <label> Add Description </label>
+        <input
+          type="text"
+          value={description}
+          placeholder="Task description"
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <br />
+        <button type="submit">Add Task</button>
+      </form>
+    </div>
+  );
+}

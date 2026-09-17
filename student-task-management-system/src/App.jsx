@@ -14,9 +14,15 @@ function App() {
   useEffect(() => {
     fetch("/api/tasks")
       .then((response) => response.json())
-      .then((data) => setTasks(data))
+      .then((data) => {
+        if (!Array.isArray(data)) {
+          throw new Error("Tasks API returned an invalid response");
+        }
+        setTasks(data);
+      })
       .catch((error) => {
         console.error("Error fetching tasks:", error);
+        setTasks([]);
       })
       .finally(() => {
         setIsLoading(false);
@@ -28,9 +34,10 @@ function App() {
   };
 
   const handleToggleTask = (taskToToggle) => {
-    const nextStatus = taskToToggle.status === "pending" ? "completed" : "pending";
+    const taskId = taskToToggle._id || taskToToggle.id;
+    const nextStatus = taskToToggle.status.toLowerCase() === "pending" ? "Completed" : "Pending";
 
-    fetch(`/api/tasks/${taskToToggle.id}`, {
+    fetch(`/api/tasks/${taskId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: nextStatus }),
@@ -42,9 +49,9 @@ function App() {
         return response.json();
       })
       .then((updatedTask) => {
-        setTasks((currentTasks) =>
-          currentTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
-        );
+        setTasks((currentTasks) => currentTasks.map((task) =>
+          (task._id || task.id) === (updatedTask._id || updatedTask.id) ? updatedTask : task
+        ));
       })
       .catch((error) => {
         console.error("Error toggling task:", error);
@@ -62,7 +69,7 @@ function App() {
         return response.json();
       })
       .then(() => {
-        setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
+        setTasks((currentTasks) => currentTasks.filter((task) => (task._id || task.id) !== taskId));
       })
       .catch((error) => {
         console.error("Error deleting task:", error);
@@ -87,7 +94,16 @@ function App() {
             />
           }
         />
-        <Route path="/tasks" element={<Tasks tasks={tasks} setTasks={setTasks} />} />
+        <Route
+          path="/tasks"
+          element={
+            <Tasks
+              tasks={tasks}
+              onToggleTask={handleToggleTask}
+              onDeleteTask={handleDeleteTask}
+            />
+          }
+        />
         <Route path="/tasks/:id" element={<TaskDetails tasks={tasks} />} />
       </Routes>
     </div>

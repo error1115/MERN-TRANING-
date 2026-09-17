@@ -1,53 +1,51 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 
-function TaskDetails({ tasks }) {
+function TaskDetails(){
     const { id } = useParams();
-    const [fetchedTask, setFetchedTask] = useState(null);
-    const [loading,setLoading]=useState(true);
-    const existingTask = tasks.find((currentTask) => currentTask.id === Number(id));
+    const [task, setTask] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
-        if (existingTask) {
-            return;
-        }
+        let ignore = false;
 
         fetch(`/api/tasks/${id}`)
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error(`Task request failed: ${response.status}`);
+                    throw new Error("Network response was not ok");
                 }
                 return response.json();
             })
-            .then((data) => setFetchedTask({ id, task: data }))
-            .catch((error) => console.error("Error fetching task:", error))
-            .finally(() => {
-                setLoading(false);
-            });
-    }, [id, existingTask]);
+            .then((data) => {
+                if (!ignore) setTask(data);
+            }).catch((requestError) => {
+                console.error("Error fetching task:", requestError);
+                if (!ignore) setError(true);
+            }).finally(() => {
+                if (!ignore) setLoading(false);
+            })
 
-    const task = existingTask || (fetchedTask?.id === id ? fetchedTask.task : null);
-    if(loading){
-        return <h2>Loading....</h2>
-    }
-    if (!task) {
-        return <p>Task not found.</p>;
+        return () => {
+            ignore = true;
+        };
+    }, [id]);
+
+    if (loading) {
+        return <h1>Loading...</h1>;
     }
 
+    if (error || !task) {
+
+        return <h1>Task not found</h1>;
+    }
     return (
-        <main className="dashboard-page">
+        <div>
             <h1>Task Details</h1>
-            <div className={`task-card ${task.status === "completed" ? "completed" : "pending"}`}>
-                <div className="task-content">
-                    <div className="task-header-row">
-                        <h3>{task.title}</h3>
-                        <span className="status-badge">{task.status}</span>
-                    </div>
-                    <p>{task.description}</p>
-                </div>
-            </div>
-        </main>
+            <h2>{task.title}</h2>
+            <h2>{task.description}</h2>
+            <h2>Status:{task.status}</h2>
+        </div>
     );
 }
-
 export default TaskDetails;
