@@ -34,7 +34,7 @@ function Dashboard(props) {
                         title={task.title} 
                         description={task.description} 
                         status={task.status}
-                        onToggle={() => props.onToggleTask(task)}
+                        onToggle={() => props.onToggleTask(task._id)}
                         onDelete={() => props.onDeleteTask(task._id || task.id)}
                     />
                 ))}
